@@ -57,7 +57,7 @@ final int alturaPlataforma = 10;
 final int velocidadePlataforma = 10;
 
 //Vidas
-final int maxVidas = 10;
+final int maxVidas = 5;
 final int maxFases = 6;
 
 //Sons do jogo
@@ -354,20 +354,15 @@ boolean mostrarVitoria, mostrarDerrota, pausado;
 int vidas;
 int placar;
 int faseAtual;
-int totalBolas;
 Minim minim;
-
 
 
 //Marca os blocos da fase atual como visíveis e atualiza o valor total de bolas na tela.
 void inicializarFaseAtual()
 {
-  totalBolas = 0;
   for (int i = 0; i < maxLinhas; i++) {
-    for (int j = 0; j < maxColunas; j++) {
+    for (int j = 0; j < maxColunas; j++)
       blocos[i][j].visible = (fases[faseAtual][i][j] > 0);
-        ++totalBolas;
-    }
   }
 }
 
@@ -392,12 +387,17 @@ void inicializarJogo()
 void finalizarJogo(boolean vitoria)
 {
   if (vitoria) {
+    sons[7].play();
+    sons[7].rewind(); 
     ++faseAtual;
+    
     //Caso existam mais fases para serem jogadas.
     if(faseAtual < maxFases)
     {
       bola.morta = true;
       vidas += maxVidas;
+      if(vidas > 99)
+        vidas=99;
       inicializarFaseAtual();
     }
     //Caso contrário encerre o jogo com vitória.
@@ -468,7 +468,7 @@ void drawJogo()
   textSize(42);
   text("FASE " + (faseAtual+1), resolucao_x/2 - 200, 45);
   text(vidas, resolucao_x/2+210, 45);
-  image(heart, resolucao_x/2+230, 10);
+  image(heart, resolucao_x/2+232, 10);
 
   //Desenhando bordas da tela.
   fill(150);
@@ -519,21 +519,11 @@ void update()
       if (colisao(bola, blocos[i][j])) {
         blocos[i][j].visible = false;
         placar += 10;
-        --totalBolas;
         
         //Tocar um som de soco aleatório.
-        if(totalBolas>0)
-        {
-          int index = int(random(3));
-          sons[index].play();
-          sons[index].rewind();
-        }
-        //Caso a bola destruída for a última, tocar um som de explosão.
-        else
-        {
-           sons[7].play();
-           sons[7].rewind(); 
-        }
+        int index = int(random(3));
+        sons[index].play();
+        sons[index].rewind();
       }
     }
   }
